@@ -16,43 +16,169 @@ info:
     name: MIT
 servers:
   - url: http://localhost
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
 paths:
-  /hello:
-    get:
-      summary: This is just a test endpoint to get you started. Please delete this endpoint.
-      operationId: hello
-      parameters:
-        - name: id
-          in: query
-          required: true
-          schema:
-            type: integer
+  /registration:
+    post:
+      summary: This is used for user registration.
+      operationId: registration
+      requestBody:
+        description: Body request of registration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
       responses:
         '200':
-          description: Test return
+          description: Register success
           content:
             application/json:    
               schema:
-                $ref: "#/components/schemas/HelloResponse"
-        '404':
-          description: Not found
+                $ref: "#/components/schemas/RegistrationResponse"
+        '400':
+          description: Register error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /login:
+    post:
+      summary: This is used for user login.
+      operationId: login
+      requestBody:
+        description: Body request of login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login success
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        '400':
+          description: Login error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /profile:
+    get:
+      summary: Getting user's profile.
+      operationId: getProfile
+      security:
+        - Bearer: []
+      responses:
+        '200':
+          description: Get profile success
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/GetProfileResponse"
+        '403':
+          description: Get profile error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Update user's profile.
+      operationId: updateProfile
+      security:
+        - Bearer: []
+      requestBody:
+        description: Body request of update profile
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Update profile success
+        '403':
+          description: Update profile error forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '409':
+          description: Update profile error conflict
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
-    HelloResponse:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
     ErrorResponse:
       type: object
       required:
         - message
       properties:
         message:
+          type: string
+    RegistrationRequest:
+      type: object
+      required:
+        - phoneNumber
+        - fullName
+        - password
+      properties:
+        phoneNumber:
+          type: string
+        fullName:
+          type: string
+        password:
+          type: string
+    RegistrationResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+    LoginRequest:
+      type: object
+      required:
+        - phoneNumber
+        - password
+      properties:
+        phoneNumber:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      required:
+        - id
+        - jwt
+      properties:
+        id:
+          type: integer
+        jwt:
+          type: string
+    GetProfileResponse:
+      type: object
+      required:
+        - fullName
+        - phoneNumber
+      properties:
+        fullName:
+          type: string
+        phoneNumber:
+          type: string
+    UpdateProfileRequest:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+        fullName:
           type: string
